@@ -2,7 +2,6 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
-import japanize_matplotlib  # グラフで日本語を使うために追加することをおすすめします！
 
 def run_simulation(n_iters):
     old_stones_list = np.zeros(n_iters, dtype=int)
@@ -72,7 +71,7 @@ def run_simulation(n_iters):
                         got_A_new = True
                     else:
                         got_B_new = True
-                    charge = 0 
+                        charge = 0 
 
                 if total_pulls in (70, 130, 150, 170, 270, 330, 350, 370) and total_pulls not in claimed_tickets:
                     tickets += 1
@@ -123,8 +122,8 @@ if st.button("シミュレーションを実行する"):
         fig1, ax1 = plt.subplots(figsize=(10, 6))
         ax1.hist(old_data, bins=50, alpha=0.5, label='Old Specs', color='cornflowerblue', density=True)
         ax1.hist(new_data, bins=50, alpha=0.5, label='New Specs', color='lightpink', density=True)
-        ax1.set_xlabel('消費した青輝石（個）')
-        ax1.set_ylabel('人数割合（確率密度）')
+        ax1.set_xlabel('Consumed Pyroxenes (Stones)')
+        ax1.set_ylabel('Probability Density')
         ax1.legend()
         ax1.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig1)
@@ -135,7 +134,7 @@ if st.button("シミュレーションを実行する"):
         colors = ['cornflowerblue', 'lightpink']
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
-        ax2.set_ylabel('消費した青輝石（個）')
+        ax2.set_ylabel('Consumed Pyroxenes (Stones)')
         ax2.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig2)
 
@@ -147,8 +146,8 @@ if st.button("シミュレーションを実行する"):
         y_new = np.arange(1, len(x_new) + 1) / len(x_new)
         ax3.plot(x_old, y_old, label='Old Specs', color='cornflowerblue', linewidth=2)
         ax3.plot(x_new, y_new, label='New Specs', color='lightpink', linewidth=2)
-        ax3.set_xlabel('消費した青輝石（個）')
-        ax3.set_ylabel('累積確率（この石数以下で引ける確率）')
+        ax3.set_xlabel('Consumed Pyroxenes (Stones)')
+        ax3.set_ylabel('Cumulative Probability')
         ax3.legend()
         ax3.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig3)
