@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
+import japanize_matplotlib  # グラフで日本語を使うために追加することをおすすめします！
 
 def run_simulation(n_iters):
     old_stones_list = np.zeros(n_iters, dtype=int)
@@ -71,7 +72,7 @@ def run_simulation(n_iters):
                         got_A_new = True
                     else:
                         got_B_new = True
-                    charge = 0  # ← ここです！正しい位置に直しました！
+                    charge = 0 
 
                 if total_pulls in (70, 130, 150, 170, 270, 330, 350, 370) and total_pulls not in claimed_tickets:
                     tickets += 1
@@ -106,22 +107,24 @@ if st.button("シミュレーションを実行する"):
         
         with col1:
             st.write("--- 旧仕様 ---")
-            st.write(f"平均: {np.mean(old_data):.1f}")
-            st.write(f"中央値: {np.percentile(old_data, 50)}")
-            st.write(f"95%ile: {np.percentile(old_data, 95)}")
-            st.write(f"最大値: {np.max(old_data)}")
+            st.write(f"平均: {np.mean(old_data):.1f} 個")
+            st.write(f"中央値: {np.percentile(old_data, 50):.0f} 個")
+            st.write(f"95%ile: {np.percentile(old_data, 95):.0f} 個")
+            st.write(f"最大値: {np.max(old_data):.0f} 個")
 
         with col2:
             st.write("--- 新仕様 ---")
-            st.write(f"平均: {np.mean(new_data):.1f}")
-            st.write(f"中央値: {np.percentile(new_data, 50)}")
-            st.write(f"95%ile: {np.percentile(new_data, 95)}")
-            st.write(f"最大値: {np.max(new_data)}")
+            st.write(f"平均: {np.mean(new_data):.1f} 個")
+            st.write(f"中央値: {np.percentile(new_data, 50):.0f} 個")
+            st.write(f"95%ile: {np.percentile(new_data, 95):.0f} 個")
+            st.write(f"最大値: {np.max(new_data):.0f} 個")
 
         st.subheader("分布 (ヒストグラム)")
         fig1, ax1 = plt.subplots(figsize=(10, 6))
         ax1.hist(old_data, bins=50, alpha=0.5, label='Old Specs', color='cornflowerblue', density=True)
         ax1.hist(new_data, bins=50, alpha=0.5, label='New Specs', color='lightpink', density=True)
+        ax1.set_xlabel('消費した青輝石（個）')
+        ax1.set_ylabel('人数割合（確率密度）')
         ax1.legend()
         ax1.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig1)
@@ -132,6 +135,7 @@ if st.button("シミュレーションを実行する"):
         colors = ['cornflowerblue', 'lightpink']
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
+        ax2.set_ylabel('消費した青輝石（個）')
         ax2.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig2)
 
@@ -143,6 +147,23 @@ if st.button("シミュレーションを実行する"):
         y_new = np.arange(1, len(x_new) + 1) / len(x_new)
         ax3.plot(x_old, y_old, label='Old Specs', color='cornflowerblue', linewidth=2)
         ax3.plot(x_new, y_new, label='New Specs', color='lightpink', linewidth=2)
+        ax3.set_xlabel('消費した青輝石（個）')
+        ax3.set_ylabel('累積確率（この石数以下で引ける確率）')
         ax3.legend()
         ax3.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig3)
+
+st.markdown("---")
+st.markdown(
+    """
+    ### 💡 試行回数と計算方法について
+
+    **試行回数とは？**
+    ここで入力する試行回数は、「このガチャに挑戦するプレイヤーの人数」を意味します。例えば「10,000」と入力した場合、1万人分のシミュレーションを一気に行い、その結果の平均やバラつきをグラフにしています。試行回数が多いほど現実に近い正確なデータになりますが、計算には少し時間がかかります。
+
+    **計算方法（シミュレーションのルール）**
+    *   **目的:** ピックアップ生徒2人（生徒Aと生徒B）を両方お迎えするまでに「消費した青輝石の数」を計算しています。
+    *   **旧仕様:** 1回0.7%の確率で抽選。200連（24,000石）ごとに、まだお迎えしていない生徒を確定で交換できます。
+    *   **新仕様:** 1回0.7%の確率で抽選。100連到達時に50%の確率でピックアップ生徒を獲得（すり抜けあり）、200連到達時は確定で獲得。さらに、道中の特定の募集回数に到達すると、無料の10連チケットがもらえ、その分消費石を節約できます。
+    """
+)
