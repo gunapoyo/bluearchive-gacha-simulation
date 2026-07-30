@@ -6,15 +6,12 @@ import streamlit as st
 def run_simulation(n_iters):
     old_stones_list = np.zeros(n_iters, dtype=int)
     new_stones_list = np.zeros(n_iters, dtype=int)
-    old_first_pulls_list = np.zeros(n_iters, dtype=int)
-    new_first_pulls_list = np.zeros(n_iters, dtype=int)
-    old_total_pulls_list = np.zeros(n_iters, dtype=int)
-    new_total_pulls_list = np.zeros(n_iters, dtype=int)
+    old_first_stones_list = np.zeros(n_iters, dtype=int)
+    new_first_stones_list = np.zeros(n_iters, dtype=int)
 
     for i in range(n_iters):
         stones = 0
         points = 0
-        total_pulls_old = 0
         got_A = False
         got_B = False
         first_recorded_old = False
@@ -25,32 +22,27 @@ def run_simulation(n_iters):
             
             for _ in range(10):
                 points += 1
-                total_pulls_old += 1
                 if random.random() < 0.007:
                     if target_A_this_pull:
                         got_A = True
                     else:
                         got_B = True
-                
-                if (got_A or got_B) and not first_recorded_old:
-                    old_first_pulls_list[i] = total_pulls_old
-                    first_recorded_old = True
 
             while points >= 200:
                 if not got_A:
                     got_A = True
                     points -= 200
-                    if not first_recorded_old:
-                        old_first_pulls_list[i] = total_pulls_old
-                        first_recorded_old = True
                 elif not got_B:
                     got_B = True
                     points -= 200
                 else:
                     break
 
+            if (got_A or got_B) and not first_recorded_old:
+                old_first_stones_list[i] = stones
+                first_recorded_old = True
+
         old_stones_list[i] = stones
-        old_total_pulls_list[i] = total_pulls_old
 
         stones_new = 0
         charge = 0
@@ -91,7 +83,7 @@ def run_simulation(n_iters):
                     charge = 0
 
                 if (got_A_new or got_B_new) and not first_recorded_new:
-                    new_first_pulls_list[i] = total_pulls
+                    new_first_stones_list[i] = stones_new
                     first_recorded_new = True
 
             if total_pulls in (70, 130, 150, 170, 270, 330, 350, 370) and total_pulls not in claimed_tickets:
@@ -99,9 +91,8 @@ def run_simulation(n_iters):
                 claimed_tickets.add(total_pulls)
 
         new_stones_list[i] = stones_new
-        new_total_pulls_list[i] = total_pulls
 
-    return old_stones_list, new_stones_list, old_first_pulls_list, new_first_pulls_list, old_total_pulls_list, new_total_pulls_list
+    return old_stones_list, new_stones_list, old_first_stones_list, new_first_stones_list
 
 st.title("ガチャ必要石シミュレーション")
 st.markdown(
@@ -121,7 +112,7 @@ n_iters = st.number_input("試行回数を入力してください", min_value=1
 
 if st.button("シミュレーションを実行する"):
     with st.spinner("アロナが一生懸命計算しています...！"):
-        old_data, new_data, old_first_pulls, new_first_pulls, old_total_pulls, new_total_pulls = run_simulation(n_iters)
+        old_data, new_data, old_first_stones, new_first_stones = run_simulation(n_iters)
 
         st.header("【2人目お迎え（コンプリート）までの消費石】")
         st.subheader("統計データ")
@@ -176,26 +167,26 @@ if st.button("シミュレーションを実行する"):
         st.pyplot(fig3)
 
         st.markdown("---")
-        st.header("【1人目お迎えと2人目お迎えまでの連数関係】")
+        st.header("【1人目お迎え vs 2人目コンプリートの消費石関係】")
         
-        diff_old = old_total_pulls - old_first_pulls
-        diff_new = new_total_pulls - new_first_pulls
+        diff_stones_old = old_data - old_first_stones
+        diff_stones_new = new_data - new_first_stones
         
-        st.subheader("1人目お迎えからの追加連数")
+        st.subheader("1人目お迎えからの追加消費石")
         col3, col4 = st.columns(2)
         with col3:
             st.write("--- 旧仕様 ---")
-            st.write(f"追加連数 (平均): {np.mean(diff_old):.1f} 連")
+            st.write(f"追加消費石 (平均): {np.mean(diff_stones_old):.1f} 個")
         with col4:
             st.write("--- 新仕様 ---")
-            st.write(f"追加連数 (平均): {np.mean(diff_new):.1f} 連")
+            st.write(f"追加消費石 (平均): {np.mean(diff_stones_new):.1f} 個")
 
-        st.subheader("1人目と合計の連数分布 (散布図)")
+        st.subheader("1人目と合計の消費石分布 (散布図)")
         fig5, ax5 = plt.subplots(figsize=(10, 6))
-        ax5.scatter(old_first_pulls, old_total_pulls, alpha=0.1, label='Old Specs', color='cornflowerblue')
-        ax5.scatter(new_first_pulls, new_total_pulls, alpha=0.1, label='New Specs', color='lightpink')
-        ax5.set_xlabel('1st Pickup (Pulls)')
-        ax5.set_ylabel('Total for Both (Pulls)')
+        ax5.scatter(old_first_stones, old_data, alpha=0.1, label='Old Specs', color='cornflowerblue')
+        ax5.scatter(new_first_stones, new_data, alpha=0.1, label='New Specs', color='lightpink')
+        ax5.set_xlabel('Consumed Pyroxenes for 1st Pickup (Stones)')
+        ax5.set_ylabel('Total Consumed Pyroxenes for Both (Stones)')
         ax5.legend()
         ax5.grid(True, linestyle='--', alpha=0.7)
         st.pyplot(fig5)
