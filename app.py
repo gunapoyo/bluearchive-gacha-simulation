@@ -71,7 +71,7 @@ def run_simulation(n_iters):
                         got_A_new = True
                     else:
                         got_B_new = True
-                        charge = 0 
+                    charge = 0 
 
                 if total_pulls in (70, 130, 150, 170, 270, 330, 350, 370) and total_pulls not in claimed_tickets:
                     tickets += 1
