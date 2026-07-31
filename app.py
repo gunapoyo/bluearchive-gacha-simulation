@@ -181,7 +181,7 @@ if st.button("シミュレーションを実行する"):
             st.write("--- 新仕様 ---")
             st.write(f"追加消費石 (平均): {np.mean(diff_stones_new):.1f} 個")
 
-        # 試行回数に応じて散布図のドットの濃さ(alpha)と大きさ(s)を自動調整！
+        # 試行回数に応じてドットの濃さと大きさを自動調整
         alpha_val = max(0.1, min(0.8, 500 / n_iters))
         size_val = max(10, min(50, 50000 / n_iters))
 
@@ -189,6 +189,11 @@ if st.button("シミュレーションを実行する"):
         fig5, ax5 = plt.subplots(figsize=(10, 6))
         ax5.scatter(old_first_stones, old_data, alpha=alpha_val, s=size_val, label='Old Specs', color='cornflowerblue')
         ax5.scatter(new_first_stones, new_data, alpha=alpha_val, s=size_val, label='New Specs', color='lightpink')
+        
+        # 先生ご指定の仮天井ライン（10,800石付近）に赤色の破線を追加！
+        ax5.axvline(x=10800, color='red', linestyle='--', linewidth=1.5, label='New Specs 仮天井ライン (約10,800石)')
+        ax5.axhline(y=10800, color='red', linestyle=':', linewidth=1, alpha=0.7)
+
         ax5.set_xlabel('Consumed Pyroxenes for 1st Pickup (Stones)')
         ax5.set_ylabel('Total Consumed Pyroxenes for Both (Stones)')
         ax5.legend()
