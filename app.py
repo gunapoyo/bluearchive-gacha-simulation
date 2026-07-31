@@ -190,9 +190,8 @@ if st.button("シミュレーションを実行する"):
         ax5.scatter(old_first_stones, old_data, alpha=alpha_val, s=size_val, label='Old Specs', color='cornflowerblue')
         ax5.scatter(new_first_stones, new_data, alpha=alpha_val, s=size_val, label='New Specs', color='lightpink')
         
-        # 先生ご指定の仮天井ライン（10,800石付近）に赤色の破線を追加！
-        ax5.axvline(x=10800, color='red', linestyle='--', linewidth=1.5, label='New Specs 仮天井ライン (約10,800石)')
-        ax5.axhline(y=10800, color='red', linestyle=':', linewidth=1, alpha=0.7)
+        # 先生ご指定の仮天井ライン（約10,800石）に赤色の「縦破線」を追加！
+        ax5.axvline(x=10800, color='red', linestyle='--', linewidth=1.5, label='仮天井ライン (約10,800石)')
 
         ax5.set_xlabel('Consumed Pyroxenes for 1st Pickup (Stones)')
         ax5.set_ylabel('Total Consumed Pyroxenes for Both (Stones)')
